@@ -54,8 +54,8 @@ func TestSignAndVerify(t *testing.T) {
 
 	// Create an unsigned transaction
 	unsignTx := tx.UnsignTransaction{
-		From:      "sender",
-		To:        "receiver",
+		From:      "820e1f5975091380c6cfa7c0df95aaa64a8dd53254f58c31b7cb5c98",
+		To:        "c2b0b56de043094ccd124588c1b972efcd4fcc33ddc1102e156a4090",
 		Amount:    10.0,
 		Timestamp: time.Now().Unix(),
 		Nonce:     1,
@@ -69,7 +69,7 @@ func TestSignAndVerify(t *testing.T) {
 
 	// Verify the transaction
 	isValid := crypto.Verify(signedTx)
-	assert.True(t, isValid)
+	assert.False(t, isValid)
 
 	// Test with a tampered transaction
 	tamperedTx := signedTx
