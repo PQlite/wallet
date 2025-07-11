@@ -5,11 +5,10 @@ import (
 	"log"
 	"strconv"
 	"time"
-	"wallet/crypto"
-	"wallet/tx"
 
 	"golang.org/x/crypto/sha3"
 
+	"github.com/PQlite/crypto"
 	"github.com/spf13/cobra"
 )
 
@@ -62,7 +61,7 @@ var SendCmd = &cobra.Command{
 			return
 		}
 
-		unsignTransaction := tx.UnsignTransaction{
+		unsignTransaction := crypto.UnsignTransaction{
 			From:      args[0],
 			To:        args[1],
 			Amount:    float32(f64),

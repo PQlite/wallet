@@ -3,8 +3,8 @@ package cmd
 import (
 	"encoding/hex"
 	"log"
-	"wallet/crypto"
 
+	"github.com/PQlite/crypto"
 	"github.com/spf13/cobra"
 )
 

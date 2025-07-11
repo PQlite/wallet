@@ -6,7 +6,8 @@ import (
 	"os"
 	"strings"
 	"syscall"
-	"wallet/crypto"
+
+	"github.com/PQlite/crypto"
 
 	"golang.org/x/term"
 )
