@@ -8,6 +8,10 @@ var rootCmd = &cobra.Command{
 		Short: "створити гаманець",
 }
 
+func init() {
+	rootCmd.AddCommand(SendCmd)
+}
+
 func Execute() {
 	cobra.CheckErr(rootCmd.Execute())
 }

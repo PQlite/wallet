@@ -28,7 +28,7 @@ var GenCmd = &cobra.Command{
 			return
 		}
 
-		newWallet := crypto.Wallet{
+		newWallet := Wallet{
 			Priv: hex.EncodeToString(privBytes),
 			Pub:  hex.EncodeToString(pubBytes),
 		}
@@ -49,6 +49,8 @@ var GenCmd = &cobra.Command{
 		}
 
 		log.Println("Нові ключі згенеровано та додано до wallet.json")
+		log.Println("Публічний ключ:", newWallet.Pub)
+		log.Println("Приватний ключ:", newWallet.Priv)
 	},
 }
 

@@ -1,16 +1,28 @@
 package cmd
 
 import (
+	"bytes"
 	"encoding/hex"
+	"encoding/json"
 	"log"
+	"net/http"
 	"strconv"
 	"time"
 
-	"golang.org/x/crypto/sha3"
-
 	"github.com/PQlite/crypto"
 	"github.com/spf13/cobra"
+	"golang.org/x/crypto/sha3"
 )
+
+type Transaction struct {
+	From      string  `json:"from"`
+	To        string  `json:"to"`
+	Amount    float32 `json:"amount"`
+	Timestamp int64   `json:"timestamp"`
+	Nonce     int     `json:"nonce"`
+	PubKey    []byte  `json:"pubkey"`
+	Signature []byte  `json:"signature"`
+}
 
 var SendCmd = &cobra.Command{
 	Use:   "send",
@@ -33,7 +45,7 @@ var SendCmd = &cobra.Command{
 			return
 		}
 
-		var senderWallet crypto.Wallet
+		var senderWallet Wallet
 		found := false
 
 		for _, w := range wallets {
@@ -55,28 +67,51 @@ var SendCmd = &cobra.Command{
 			return
 		}
 
-		senderPrivKey, senderPubKey, err := crypto.LoadKeyPair(senderWallet)
+		senderPrivKeyBytes, err := hex.DecodeString(senderWallet.Priv)
 		if err != nil {
-			log.Println("Failed to load key pair: ", err)
+			log.Println("Failed to decode private key: ", err)
 			return
 		}
 
-		unsignTransaction := crypto.UnsignTransaction{
+		senderPubKeyBytes, err := hex.DecodeString(senderWallet.Pub)
+		if err != nil {
+			log.Println("Failed to decode public key: ", err)
+			return
+		}
+
+		tx := &Transaction{
 			From:      args[0],
 			To:        args[1],
 			Amount:    float32(f64),
-			Timestamp: time.Now().Unix(),
-			Nonce:     1,
+			Timestamp: time.Now().UnixMilli(),
+			Nonce:     1, // TODO: nonce
+			PubKey:    senderPubKeyBytes,
 		}
 
-		signedTx, err := crypto.Sign(unsignTransaction, senderPrivKey, senderPubKey)
+		unsignedTxBytes, err := json.Marshal(tx)
+		if err != nil {
+			log.Println("помилка marshal unsignedTx")
+			return
+		}
+
+		signature, err := crypto.Sign(senderPrivKeyBytes, unsignedTxBytes)
 		if err != nil {
 			log.Println("Failed to sign transaction: ", err)
 			return
 		}
+		tx.Signature = signature
 
-		log.Printf("Signed Transaction: %+v\n", signedTx)
-		isValid := crypto.Verify(signedTx)
-		log.Println("верифікація транзакції повертає: ", isValid)
+		body, err := json.Marshal(tx)
+		if err != nil {
+			log.Println("помилка marshal signedTx")
+			return
+		}
+
+		r, err := http.Post("http://localhost:8081/tx", "application/json", bytes.NewBuffer(body))
+		if err != nil {
+			log.Println("помилка відправки транзакції")
+			return
+		}
+		log.Println(r.StatusCode)
 	},
 }

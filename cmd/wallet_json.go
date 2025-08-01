@@ -14,6 +14,12 @@ import (
 
 const walletFileName = "wallet.json"
 
+// Wallet represents a single wallet with its keys.
+type Wallet struct {
+	Priv string `json:"priv"`
+	Pub  string `json:"pub"`
+}
+
 // getPassword запитує у користувача пароль
 func getPassword() (string, error) {
 	fmt.Print("Enter password: ")
@@ -27,8 +33,8 @@ func getPassword() (string, error) {
 }
 
 // LoadWallets читає гаманці з файлу wallet.json
-func LoadWallets() ([]crypto.Wallet, error) {
-	var wallets []crypto.Wallet
+func LoadWallets() ([]Wallet, error) {
+	var wallets []Wallet
 
 	if _, err := os.Stat(walletFileName); os.IsNotExist(err) {
 		return wallets, nil // Повертаємо порожній список, якщо файл не існує
@@ -62,7 +68,7 @@ func LoadWallets() ([]crypto.Wallet, error) {
 }
 
 // SaveWallets зберігає гаманці у файл wallet.json
-func SaveWallets(wallets []crypto.Wallet) error {
+func SaveWallets(wallets []Wallet) error {
 	updatedWalletJSON, err := json.MarshalIndent(wallets, "", "  ")
 	if err != nil {
 		return fmt.Errorf("Failed to marshal wallets to JSON: %w", err)
